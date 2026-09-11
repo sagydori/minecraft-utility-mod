@@ -3,100 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Utility Mod — Download</title>
+<title>Utility Mod — Fabric utility client for Minecraft 26.1.2</title>
+<meta name="description" content="A client-side Fabric utility mod for Minecraft 26.1.2: humanized action recorder/replayer, auto schematic builder, and a suite of QoL modules with a clean in-game GUI.">
 <style>
     :root {
-        --bg-top:#1a1b22; --bg-bot:#141419; --card:#20222c; --card-line:#2c2f3b;
-        --accent:#5a8dee; --accent-light:#7ba6f5; --text:#f2f3f7; --dim:#9ba0b3; --faint:#6a6f80;
-        --ok:#56c878;
+        --bg:#0e0f13; --card:#181a22; --card2:#1e212b; --line:#282b36;
+        --accent:#5a8dee; --accent2:#7ba6f5; --accentglow:rgba(90,141,238,.35);
+        --text:#eef0f6; --dim:#a2a7b8; --faint:#6b7080; --ok:#56c878; --radius:14px;
     }
-    * { box-sizing:border-box; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
     body {
-        margin:0; min-height:100vh; font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-        color:var(--text); background:linear-gradient(160deg,var(--bg-top),var(--bg-bot));
-        display:flex; align-items:center; justify-content:center; padding:24px;
+        font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+        color:var(--text); background:var(--bg); line-height:1.6;
+        background-image:radial-gradient(1000px 500px at 80% -10%, rgba(90,141,238,.18), transparent 60%),
+                         radial-gradient(800px 400px at 0% 0%, rgba(90,141,238,.08), transparent 55%);
+        background-repeat:no-repeat;
     }
-    .card {
-        width:100%; max-width:520px; background:var(--card);
-        border:1px solid var(--card-line); border-radius:16px; padding:32px;
-        box-shadow:0 20px 60px rgba(0,0,0,.45);
-    }
-    .badge {
-        display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--accent-light);
-        background:rgba(90,141,238,.12); border:1px solid rgba(90,141,238,.3);
-        padding:4px 10px; border-radius:999px; margin-bottom:16px;
-    }
-    .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); }
-    h1 { margin:0 0 6px; font-size:28px; letter-spacing:-.5px; }
-    .sub { margin:0 0 24px; color:var(--dim); font-size:15px; line-height:1.5; }
-    .download {
-        display:flex; align-items:center; justify-content:center; gap:10px;
-        width:100%; padding:16px; font-size:16px; font-weight:600; color:#fff; text-decoration:none;
-        background:linear-gradient(135deg,var(--accent),var(--accent-light));
-        border-radius:12px; transition:transform .12s ease, box-shadow .12s ease;
-        box-shadow:0 8px 24px rgba(90,141,238,.35);
-    }
-    .download:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(90,141,238,.5); }
-    .meta { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 4px; }
-    .pill { font-size:12px; color:var(--dim); background:#191a21; border:1px solid var(--card-line);
-        padding:5px 10px; border-radius:8px; }
-    .section { margin-top:26px; }
-    .section h2 { font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--faint); margin:0 0 10px; }
-    ol { margin:0; padding-left:20px; color:var(--dim); font-size:14px; line-height:1.7; }
-    ol b { color:var(--text); }
-    code { background:#12131a; border:1px solid var(--card-line); border-radius:5px; padding:1px 6px;
-        font-family:ui-monospace,'Cascadia Code',Consolas,monospace; font-size:12px; color:var(--accent-light); }
-    a { color:var(--accent-light); }
-    .foot { margin-top:26px; font-size:12px; color:var(--faint); text-align:center; }
-    .feats { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
-    .feat { font-size:11px; color:var(--dim); background:#191a21; border:1px solid var(--card-line);
-        padding:4px 8px; border-radius:6px; }
+    a { color:var(--accent2); text-decoration:none; }
+    .wrap { max-width:1000px; margin:0 auto; padding:0 24px; }
+
+    nav { display:flex; align-items:center; justify-content:space-between; padding:20px 0; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:17px; letter-spacing:-.2px; }
+    .logo { width:26px; height:26px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent2));
+        box-shadow:0 4px 14px var(--accentglow); }
+    .navlinks { display:flex; gap:22px; align-items:center; font-size:14px; color:var(--dim); }
+    .navlinks a:hover { color:var(--text); }
+
+    .hero { padding:56px 0 40px; text-align:center; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600;
+        color:var(--accent2); background:rgba(90,141,238,.1); border:1px solid rgba(90,141,238,.28);
+        padding:6px 14px; border-radius:999px; margin-bottom:22px; letter-spacing:.3px; }
+    .dot { width:7px; height:7px; border-radius:50%; background:var(--ok); box-shadow:0 0 8px var(--ok); }
+    h1 { font-size:clamp(34px,6vw,58px); line-height:1.05; letter-spacing:-1.5px; font-weight:800; }
+    h1 .grad { background:linear-gradient(120deg,var(--accent2),#c9d8ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .lead { max-width:600px; margin:18px auto 0; color:var(--dim); font-size:18px; }
+    .cta { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:30px; }
+    .btn { display:inline-flex; align-items:center; gap:9px; font-weight:600; font-size:15px;
+        padding:14px 26px; border-radius:12px; transition:transform .12s ease, box-shadow .12s ease, border-color .15s; }
+    .btn-primary { color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent2));
+        box-shadow:0 10px 26px var(--accentglow); }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 14px 34px var(--accentglow); }
+    .btn-ghost { color:var(--text); background:var(--card2); border:1px solid var(--line); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent2); }
+    .pills { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:26px; }
+    .pill { font-size:12.5px; color:var(--dim); background:var(--card); border:1px solid var(--line);
+        padding:6px 13px; border-radius:8px; }
+    .pill b { color:var(--text); font-weight:600; }
+
+    section { padding:44px 0; }
+    .kicker { font-size:12.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent2); }
+    h2 { font-size:27px; letter-spacing:-.6px; margin:8px 0 4px; font-weight:750; }
+    .muted { color:var(--dim); }
+
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-top:26px; }
+    .feature { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px; transition:border-color .15s, transform .15s; }
+    .feature:hover { border-color:var(--accent); transform:translateY(-3px); }
+    .feature .ic { width:38px; height:38px; border-radius:10px; display:grid; place-items:center; font-size:19px;
+        background:rgba(90,141,238,.12); border:1px solid rgba(90,141,238,.25); margin-bottom:14px; }
+    .feature h3 { font-size:16px; margin-bottom:6px; }
+    .feature p { font-size:13.5px; color:var(--dim); }
+    .tag { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--ok);
+        background:rgba(86,200,120,.12); border:1px solid rgba(86,200,120,.3); padding:2px 7px; border-radius:5px; margin-left:6px; vertical-align:middle; }
+
+    .steps { margin-top:26px; display:grid; gap:14px; counter-reset:step; }
+    .step { display:flex; gap:16px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; align-items:flex-start; }
+    .step::before { counter-increment:step; content:counter(step); flex:0 0 auto; width:30px; height:30px; border-radius:9px;
+        display:grid; place-items:center; font-weight:700; color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent2)); }
+    .step h4 { font-size:15px; margin-bottom:2px; }
+    .step p { font-size:13.5px; color:var(--dim); }
+    code { font-family:ui-monospace,'Cascadia Code',Consolas,monospace; font-size:12.5px; color:var(--accent2);
+        background:#0b0c10; border:1px solid var(--line); border-radius:5px; padding:1.5px 6px; }
+
+    .note { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:12px; padding:18px 20px; margin-top:24px; }
+    .note h4 { font-size:14px; margin-bottom:6px; }
+    .note p { font-size:13.5px; color:var(--dim); }
+
+    footer { border-top:1px solid var(--line); margin-top:40px; padding:28px 0 50px; color:var(--faint); font-size:13px; }
+    footer .wrap { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
 </style>
 </head>
 <body>
-    <main class="card">
-        <span class="badge"><span class="dot"></span>Fabric · client-side</span>
-        <h1>Utility Mod</h1>
-        <p class="sub">A client-side Fabric utility mod for Minecraft — a humanized action
-        recorder/replayer plus a suite of QoL modules with a custom in-game GUI.</p>
-
-        <a class="download" href="./utilitymod-3.0.0.jar" download>
-            ⬇ &nbsp;Download utilitymod-3.0.0.jar
-        </a>
-
-        <div class="meta">
-            <span class="pill">Minecraft 26.1.2</span>
-            <span class="pill">Fabric Loader 0.16+</span>
-            <span class="pill">Java 25</span>
-            <span class="pill">v3.0.0 · MC 26.1.2</span>
+<div class="wrap">
+    <nav>
+        <div class="brand"><span class="logo"></span> Utility Mod</div>
+        <div class="navlinks">
+            <a href="#features">Features</a>
+            <a href="#install">Install</a>
+            <a href="https://github.com/sagydori/minecraft-utility-mod">GitHub</a>
         </div>
+    </nav>
+</div>
 
-        <div class="section">
-            <h2>Install</h2>
-            <ol>
-                <li>Install <b>Fabric Loader</b> for Minecraft 26.1.2.</li>
-                <li>Put <b>Fabric API</b> and <code>utilitymod-3.0.0.jar</code> in your <code>.minecraft/mods</code> folder.</li>
-                <li>Launch the Fabric 26.1.2 profile. Open the menu with <b>Right&nbsp;Shift</b>.</li>
-            </ol>
+<header class="hero">
+    <div class="wrap">
+        <span class="eyebrow"><span class="dot"></span> Fabric · client-side · Minecraft 26.1.2</span>
+        <h1>The all-in-one<br><span class="grad">Fabric utility mod</span></h1>
+        <p class="lead">A humanized action recorder &amp; replayer, an auto schematic builder, and a full suite of
+        quality-of-life modules — all behind a clean, custom in-game GUI.</p>
+        <div class="cta">
+            <a class="btn btn-primary" href="./utilitymod-3.1.0.jar" download>Download v3.1.0</a>
+            <a class="btn btn-ghost" href="https://github.com/sagydori/minecraft-utility-mod/releases">All releases</a>
         </div>
+        <div class="pills">
+            <span class="pill"><b>Minecraft</b> 26.1.2</span>
+            <span class="pill"><b>Fabric Loader</b> 0.16+</span>
+            <span class="pill"><b>Fabric API</b> required</span>
+            <span class="pill"><b>Java</b> 25</span>
+        </div>
+    </div>
+</header>
 
-        <div class="section">
-            <h2>Includes</h2>
-            <div class="feats">
-                <span class="feat">Action Recorder / Replayer</span>
-                <span class="feat">Waypoints</span>
-                <span class="feat">Block ESP</span>
-                <span class="feat">Freecam</span>
-                <span class="feat">Fullbright</span>
-                <span class="feat">AutoTool / AutoEat</span>
-                <span class="feat">HUD editor</span>
-                <span class="feat">Macros</span>
-                <span class="feat">Profiles</span>
+<section id="features">
+    <div class="wrap">
+        <div class="kicker">Features</div>
+        <h2>Everything, in one mod</h2>
+        <p class="muted">Each module has its own settings and keybind, saved into switchable profiles.</p>
+        <div class="grid">
+            <div class="feature">
+                <div class="ic">⏺</div>
+                <h3>Humanized Recorder</h3>
+                <p>Record your movement, camera and actions tick-by-tick, then replay them with natural timing jitter, micro-corrections and reaction delays — never robotic.</p>
+            </div>
+            <div class="feature">
+                <div class="ic">🏗</div>
+                <h3>Auto Schematic Builder <span class="tag">NEW</span></h3>
+                <p>Load a schematic and let the mod place it block-by-block with human-like pacing that speeds up and slows down as it goes.</p>
+            </div>
+            <div class="feature">
+                <div class="ic">⚙</div>
+                <h3>QoL Modules</h3>
+                <p>AutoSprint, AutoJump, AutoTool, AutoEat, AutoReconnect, Sprint Reset, Rotation Lock, Chat Filter, Anti-AFK, Macros &amp; Fullbright.</p>
+            </div>
+            <div class="feature">
+                <div class="ic">🎛</div>
+                <h3>Clean Click GUI</h3>
+                <p>A dark, categorized menu with a search bar, inline settings, sliders, toggles and colour pickers. Opens with Right Shift.</p>
+            </div>
+            <div class="feature">
+                <div class="ic">🧭</div>
+                <h3>HUD &amp; Waypoints</h3>
+                <p>Coordinates, FPS/ping/TPS/memory and named waypoints — drag every element where you want it in the HUD editor.</p>
+            </div>
+            <div class="feature">
+                <div class="ic">💾</div>
+                <h3>Profiles</h3>
+                <p>Save named config profiles and auto-switch them per server. Every setting persists between sessions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="install">
+    <div class="wrap">
+        <div class="kicker">Get started</div>
+        <h2>Install in three steps</h2>
+        <div class="steps">
+            <div class="step">
+                <div>
+                    <h4>Install Fabric for 26.1.2</h4>
+                    <p>Run the <a href="https://fabricmc.net/use/installer/">Fabric installer</a> and pick Minecraft 26.1.2. This adds a Fabric profile to your launcher.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div>
+                    <h4>Add the mods</h4>
+                    <p>Drop <a href="https://modrinth.com/mod/fabric-api">Fabric API</a> (for 26.1.2) and <code>utilitymod-3.1.0.jar</code> into <code>.minecraft/mods</code>.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div>
+                    <h4>Launch &amp; open the menu</h4>
+                    <p>Start the Fabric 26.1.2 profile and press <code>Right Shift</code> in-game to open Utility Mod.</p>
+                </div>
             </div>
         </div>
 
-        <p class="foot">Requires <a href="https://fabricmc.net/use/installer/">Fabric</a> +
-        <a href="https://modrinth.com/mod/fabric-api">Fabric API</a>. Personal-use utility mod.</p>
-    </main>
+        <div class="note">
+            <h4>A note on Minecraft 26.x</h4>
+            <p>26.x reworked the render pipeline and removed some hooks mods relied on. Block ESP and waypoints currently
+            display as HUD readouts (not 3D outlines), and Freecam is disabled on this version. Everything else — including
+            the recorder and schematic builder — runs normally.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="wrap">
+        <span>Utility Mod · client-side Fabric mod · MIT licensed</span>
+        <span><a href="https://github.com/sagydori/minecraft-utility-mod">Source on GitHub</a></span>
+    </div>
+</footer>
 </body>
 </html>
